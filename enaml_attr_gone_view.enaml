@@ -1,0 +1,29 @@
+from enaml.core.api import Looper
+from enaml.widgets.api import Window, Container, PushButton, ScrollArea
+
+
+enamldef Main(Window): window:
+    attr test_attr
+    attr app
+    attr save_attr
+    Container:
+        ScrollArea:
+            Container:
+                Looper:
+                    iterable << app.looper_container_list
+                    PushButton:
+                        text = 'pb %s' % loop.item
+                        clicked ::
+                            save_attr = test_attr
+                            print("--- clicked ---")
+                            print("save_attr", save_attr)
+                            print("app      ", app)
+                            print("test_attr", test_attr)
+                            app.looper_container_list = ['y', 'z']
+                            print("save_attr after", save_attr)     # this attr is still alive/accessible
+                            # but both attributes that are initialized in the instantiation of this view via the kwargs
+                            # .. are no longer accessible/alive here - reproduce by uncomment one of next two lines:
+                            #print("app       after", app)          # raising NameError: name 'app' is not defined
+                            #print("test_attr after", test_attr)    # raising NameError: name 'test_attr' is not defined
+                            print("app       after", window.app)          # window is still defined
+                            print("test_attr after", window.test_attr)    # window is still defined
